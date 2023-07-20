@@ -1,0 +1,24 @@
+---
+- name: ANSISTRANO | download | Create release folder
+  file:
+    state: directory
+    path: "{{ ansistrano_release_path.stdout }}"
+
+- block:
+  # We should be able to remove default(omit) filters and add defaults once we deprecate Ansible 1.9
+  - name: ANSISTRANO | download | Download artifact to localhost
+    get_url:
+      url: "{{ ansistrano_get_url }}"
+      dest: "/tmp/{{ path | default('symfony') }}_{{ ansistrano_git_branch }}_{{ ansistrano_get_url | urlsplit('path') | basename }}"
+      force_basic_auth: "{{ ansistrano_download_force_basic_auth | default(omit) }}"
+      headers: "{{ ansistrano_download_headers | default(omit) }}"
+    run_once: true
+    become: false
+    delegate_to: localhost
+
+
+  # We should be able to remove default(omit) filters and add defaults once we deprecate Ansible 1.9
+  - name: ANSISTRANO | download | Upload artifact from localhost
+    copy:
+      src: "/tmp/{{ path | default('symfony') }}_{{ ansistrano_git_branch }}_{{ ansistrano_get_url | urlsplit('path') | basename }}"
+      dest: "{{ ansistrano_release_path.stdout }}/{{ ansistrano_get_url | urlsplit('path') | basename }}"
