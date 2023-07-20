@@ -12,6 +12,7 @@
       dest: "/tmp/{{ path | default('symfony') }}_{{ ansistrano_git_branch }}_{{ ansistrano_get_url | urlsplit('path') | basename }}"
       force_basic_auth: "{{ ansistrano_download_force_basic_auth | default(omit) }}"
       headers: "{{ ansistrano_download_headers | default(omit) }}"
+      timeout: 240
     run_once: true
     become: false
     delegate_to: localhost
